@@ -12,10 +12,12 @@ namespace BookManagementAPI.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryRepository categoryRepository;
+        private readonly IBookRepository bookRepository;
 
-        public CategoryController(ICategoryRepository _repo)
+        public CategoryController(ICategoryRepository _cateRepo, IBookRepository _bookRepo)
         {
-            categoryRepository = _repo;
+            categoryRepository = _cateRepo;
+            bookRepository = _bookRepo;
         }
 
         [HttpGet]
@@ -73,6 +75,11 @@ namespace BookManagementAPI.Controllers
             {
                 return NotFound();
             }
+            if (bookRepository.ContainCategory(id))
+            {
+                return BadRequest("There're books belong to this category. Failed to delete.");
+            }
+
             categoryRepository.Delete(cate);
             categoryRepository.Save();
             return Ok();

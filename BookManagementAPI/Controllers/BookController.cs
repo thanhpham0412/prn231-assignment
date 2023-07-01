@@ -63,6 +63,10 @@ namespace BookManagementAPI.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Insert([FromBody] Book book)
         {
+            if (bookRepository.GetByISBN(book.ISBN) != null)
+            {
+                return BadRequest("ISBN already exists.");
+            }
             bookRepository.Insert(book);
             bookRepository.Save();
             return Ok();

@@ -32,7 +32,7 @@
                 @Html.DisplayNameFor(model => model.Author)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Category.Name)
+                @Html.DisplayNameFor(model => model.Category)
             </th>
             <th></th>
         </tr>
@@ -83,7 +83,7 @@
             WriteLiteral("<button type=\"button\" class=\"btn btn-primary\">");
         }
         
-            <a asp-controller="Book" asp-action="Index" asp-route-page=@i asp-route-search=@TempData["search"]>Page @i</a>
+            <a asp-controller="Book" style="color: black;" asp-action="Index" asp-route-page=@i asp-route-search=@TempData["search"]>Page @i</a>
         WriteLiteral("</button>");
 
     }

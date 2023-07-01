@@ -11,6 +11,8 @@ namespace Repository.Interface
     {
         public List<Book> GetAll();
         public Book GetById(int id);
+        public Book GetByISBN(string isbn);
+        public bool ContainCategory(int cateId);
         public void Insert(Book book);
         public void Update(Book book);
         public void Delete(Book book);

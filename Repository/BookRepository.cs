@@ -11,6 +11,14 @@ namespace Repository
 {
     public class BookRepository : IBookRepository
     {
+        public bool ContainCategory(int cateId)
+        {
+            var bookList = BookDAO.Instance.GetAll();
+            return bookList.Where(b => b.CategoryId == cateId).Any();
+        }
+
+        public Book GetByISBN(string isbn) => BookDAO.Instance.GetByISBN(isbn);
+
         void IBookRepository.Delete(Book book) => BookDAO.Instance.Delete(book);
 
         List<Book> IBookRepository.GetAll() => BookDAO.Instance.GetAll();

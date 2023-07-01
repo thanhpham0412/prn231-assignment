@@ -68,6 +68,7 @@ namespace BookManagementClient.Controllers
                 return RedirectToAction("Index", "Book");
             } else
             {
+                TempData["ErrorMessage"] = "Invalid username or password";
                 return View();
             }
             
@@ -107,6 +108,7 @@ namespace BookManagementClient.Controllers
             }
             else
             {
+                TempData["ErrorMessage"] = "Username is already exists.";
                 return View();
             }
 

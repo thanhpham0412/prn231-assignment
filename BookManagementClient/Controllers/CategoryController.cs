@@ -1,90 +1,33 @@
 ﻿using BookManagementClient.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Session;
 
 namespace BookManagementClient.Controllers
 {
-    public class BookController : Controller
+    public class CategoryController : Controller
     {
         private readonly HttpClient client = null;
-        private string BookApiUrl;
         private string CateApiUrl;
 
-        public BookController()
+        public CategoryController()
         {
             client = new HttpClient();
             var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
-            BookApiUrl = "https://localhost:44326/Book";
             CateApiUrl = "https://localhost:44326/Category";
         }
 
-        // GET: BookController
-        public async Task<IActionResult> Index(int? page, string? search)
-        {
-            var _search = search ?? "";
-            var _page = page ?? 1;
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("token"));
-            HttpResponseMessage response = await client.GetAsync(BookApiUrl + "/pageInfo?page=" + _page + "&search=" + _search);
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                return RedirectToAction("UnauthorizedError", "Home");
-            } else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                return RedirectToAction("ForbiddenError", "Home");
-            }
-            string strData = await response.Content.ReadAsStringAsync();
-            PageInfoDTO pageInfo = JsonConvert.DeserializeObject<PageInfoDTO>(strData);
-
-            response = await client.GetAsync(BookApiUrl + "?$expand=Category&$filter=contains(Title,'" + search + "')" + pageInfo.PageQuery);
-            strData = await response.Content.ReadAsStringAsync();
-            List<BookModel> items = JsonConvert.DeserializeObject<List<BookModel>>(strData);
-
-            TempData["search"] = _search;
-            TempData["pageInfo"] = pageInfo;
-            return View(items);
-        }
-
-        // GET: BookController/Details/5
-        public async Task<IActionResult> Details(int id)
+        // GET: CategoryController
+        public async Task<IActionResult> Index()
         {
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("token"));
-
-            HttpResponseMessage response = await client.GetAsync(BookApiUrl + "/" + id + "?$expand=Category");
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                return RedirectToAction("UnauthorizedError", "Home");
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                return RedirectToAction("ForbiddenError", "Home");
-            }
-            string strData = await response.Content.ReadAsStringAsync();
-
-            BookModel item = JsonConvert.DeserializeObject<BookModel>(strData);
-
-            return View(item);
-        }
-
-        // GET: BookController/Create
-        public async Task<IActionResult> Create()
-        {
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("token"));
-
             HttpResponseMessage response = await client.GetAsync(CateApiUrl);
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
@@ -94,37 +37,158 @@ namespace BookManagementClient.Controllers
             {
                 return RedirectToAction("ForbiddenError", "Home");
             }
-
             string strData = await response.Content.ReadAsStringAsync();
-            List<CategoryModel> cateList = JsonConvert.DeserializeObject<List<CategoryModel>>(strData);
-            var items = cateList.Select(c => new SelectListItem
+            List<CategoryModel> items = JsonConvert.DeserializeObject<List<CategoryModel>>(strData);
+
+            return View(items);
+        }
+
+        // GET: CategoryController/Details/5
+        public async Task<IActionResult> Details(int id)
+        {
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("token"));
+            HttpResponseMessage response = await client.GetAsync(CateApiUrl + "/" + id);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
-                Text = c.Name,
-                Value = c.Id.ToString()
-            });
-            ViewBag.CateList = new SelectList(items, "Value", "Text");
+                return RedirectToAction("UnauthorizedError", "Home");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                return RedirectToAction("ForbiddenError", "Home");
+            }
+            string strData = await response.Content.ReadAsStringAsync();
+            CategoryModel item = JsonConvert.DeserializeObject<CategoryModel>(strData);
+
+
+            return View(item);
+        }
+
+        // GET: CategoryController/Create
+        public ActionResult Create()
+        {
             return View();
         }
 
-        // POST: BookController/Create
+        // POST: CategoryController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(IFormCollection collection)
         {
+            var cate = new CategoryModel
+            {
+                Name = collection["Name"]
+            };
+            var json = JsonConvert.SerializeObject(cate);
+            var data = new StringContent(json, Encoding.UTF8, "application/json");
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("token"));
-
-            var book = new BookModel
+            HttpResponseMessage response = await client.PostAsync(CateApiUrl, data);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
-                ISBN = collection["ISBN"],
-                Title = collection["Title"],
-                Author = collection["Author"],
-                CategoryId = Convert.ToInt32(collection["Category"])
-            };
-            var json = JsonConvert.SerializeObject(book);
-            var data = new StringContent(json, Encoding.UTF8, "application/json");
+                return RedirectToAction("UnauthorizedError", "Home");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                return RedirectToAction("ForbiddenError", "Home");
+            }
 
-            HttpResponseMessage response = await client.PostAsync(BookApiUrl, data);
+            try
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        // GET: CategoryController/Edit/5
+        public async Task<IActionResult> Edit(int id)
+        {
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("token"));
+            HttpResponseMessage response = await client.GetAsync(CateApiUrl + "/" + id);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                return RedirectToAction("UnauthorizedError", "Home");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                return RedirectToAction("ForbiddenError", "Home");
+            }
+            string strData = await response.Content.ReadAsStringAsync();
+            CategoryModel item = JsonConvert.DeserializeObject<CategoryModel>(strData);
+
+
+            return View(item);
+
+        }
+
+        // POST: CategoryController/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, IFormCollection collection)
+        {
+            var cate = new CategoryModel
+            {
+                Id = id,
+                Name = collection["Name"]
+            };
+            var json = JsonConvert.SerializeObject(cate);
+            var data = new StringContent(json, Encoding.UTF8, "application/json");
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("token"));
+            HttpResponseMessage response = await client.PutAsync(CateApiUrl, data);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                return RedirectToAction("UnauthorizedError", "Home");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                return RedirectToAction("ForbiddenError", "Home");
+            }
+
+            try
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        // GET: CategoryController/Delete/5
+        public async Task<IActionResult> Delete(int id)
+        {
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("token"));
+            HttpResponseMessage response = await client.GetAsync(CateApiUrl + "/" + id);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                return RedirectToAction("UnauthorizedError", "Home");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                return RedirectToAction("ForbiddenError", "Home");
+            }
+            string strData = await response.Content.ReadAsStringAsync();
+            CategoryModel item = JsonConvert.DeserializeObject<CategoryModel>(strData);
+
+
+            return View(item);
+
+        }
+
+        // POST: CategoryController/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id, IFormCollection collection)
+        {
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("token"));
+            HttpResponseMessage response = await client.DeleteAsync(CateApiUrl + "/" + id);
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 return RedirectToAction("UnauthorizedError", "Home");
@@ -135,130 +199,10 @@ namespace BookManagementClient.Controllers
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
             {
-                TempData["ErrorMessage"] = "ISBN is already exists.";
-                return RedirectToAction("Create", "Book");
+                TempData["ErrorMessage"] = "There're books belong to this category. Failed to delete.";
+                return RedirectToAction("Delete", "Category", new {id = id});
             }
 
-
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: BookController/Edit/5
-        public async Task<IActionResult> Edit(int id)
-        {
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("token"));
-
-            HttpResponseMessage response = await client.GetAsync(BookApiUrl + "/" + id + "?$expand=Category");
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                return RedirectToAction("UnauthorizedError", "Home");
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                return RedirectToAction("ForbiddenError", "Home");
-            }
-            string strData = await response.Content.ReadAsStringAsync();
-
-            BookModel item = JsonConvert.DeserializeObject<BookModel>(strData);
-
-            response = await client.GetAsync(CateApiUrl);
-            strData = await response.Content.ReadAsStringAsync();
-            List<CategoryModel> cateList = JsonConvert.DeserializeObject<List<CategoryModel>>(strData);
-            var items = cateList.Select(c => new SelectListItem
-            {
-                Text = c.Name,
-                Value = c.Id.ToString()
-            });
-            ViewBag.CateList = new SelectList(items, "Value", "Text", item.CategoryId.ToString());
-            return View(item);
-        }
-
-        // POST: BookController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, IFormCollection collection)
-        {
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("token"));
-
-            var updateBook = new BookModel
-            {
-                Id = id,
-                ISBN = collection["ISBN"],
-                Title = collection["Title"],
-                Author = collection["Author"],
-                CategoryId = Convert.ToInt32(collection["CategoryId"])
-            };
-            var json = JsonConvert.SerializeObject(updateBook);
-            var data = new StringContent(json, Encoding.UTF8, "application/json");
-
-            HttpResponseMessage response = await client.PutAsync(BookApiUrl, data);
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                return RedirectToAction("UnauthorizedError", "Home");
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                return RedirectToAction("ForbiddenError", "Home");
-            }
-
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: BookController/Delete/5
-        public async Task<IActionResult> Delete(int id)
-        {
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("token"));
-
-            HttpResponseMessage response = await client.GetAsync(BookApiUrl + "/" + id + "?$expand=Category");
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                return RedirectToAction("UnauthorizedError", "Home");
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                return RedirectToAction("ForbiddenError", "Home");
-            }
-            string strData = await response.Content.ReadAsStringAsync();
-
-            BookModel item = JsonConvert.DeserializeObject<BookModel>(strData);
-
-            return View(item);
-        }
-
-        // POST: BookController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id, IFormCollection collection)
-        {
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("token"));
-
-            HttpResponseMessage response = await client.DeleteAsync(BookApiUrl + "/" + id);
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                return RedirectToAction("UnauthorizedError", "Home");
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                return RedirectToAction("ForbiddenError", "Home");
-            }
             try
             {
                 return RedirectToAction(nameof(Index));

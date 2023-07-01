@@ -49,6 +49,11 @@ namespace DAO
             return dbContext.Books.FirstOrDefault(b => b.Id == id);
         }
 
+        public Book GetByISBN(string isbn)
+        {
+            return dbContext.Books.FirstOrDefault(b => b.ISBN == isbn);
+        }
+
         public void Insert(Book book)
         {
             dbContext.Books.Add(book);

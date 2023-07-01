@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace BookManagementAPI
 {
@@ -53,6 +54,10 @@ namespace BookManagementAPI
 
             //services.AddControllers();
             services.AddControllers()
+                    /*.AddJsonOptions(options =>
+                    {
+                        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                    })*/
                     .AddOData(options => options
                         //.AddRouteComponents("odata", GetEdmModel())
                         .Select()
