@@ -1,0 +1,91 @@
+﻿@using Microsoft.AspNetCore.Http
+@model IEnumerable<BookManagementClient.Models.BookModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+@if (Context.Session.GetString("role") == "Admin")
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
+<form asp-controller="Book" asp-action="Index" method="get">
+    <input type="text" name="search" value="@TempData["search"]"/>
+    <input type="submit" value="Search"/>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ISBN)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Author)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ISBN)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Author)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category.Name)
+            </td>
+            @if (Context.Session.GetString("role") == "Admin")
+            {
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new {  id=item.Id  }) |
+                    @Html.ActionLink("Details", "Details", new { id=item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+                </td>
+            } else if (Context.Session.GetString("role") == "User")
+            {
+                <td>
+                    @Html.ActionLink("Details", "Details", new { id=item.Id })
+                </td>
+            }
+            </tr>
+}
+    </tbody>
+</table>
+
+@{
+    for (int i = 1; i <= ((PageInfoDTO)TempData["pageInfo"]).TotalPage; i++)
+    {
+        if (((PageInfoDTO)TempData["pageInfo"]).CurrentPage != i)
+        {
+            WriteLiteral("<button type=\"button\" class=\"btn btn-light\">");
+        } else {
+            WriteLiteral("<button type=\"button\" class=\"btn btn-primary\">");
+        }
+        
+            <a asp-controller="Book" asp-action="Index" asp-route-page=@i asp-route-search=@TempData["search"]>Page @i</a>
+        WriteLiteral("</button>");
+
+    }
+}
+

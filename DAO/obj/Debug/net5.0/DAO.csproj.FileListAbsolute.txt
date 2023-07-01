@@ -1,0 +1,16 @@
+E:\workplace\prn231\Assignment2_BookManagement\DAO\bin\Debug\net5.0\appsettings.json
+E:\workplace\prn231\Assignment2_BookManagement\DAO\bin\Debug\net5.0\DAO.deps.json
+E:\workplace\prn231\Assignment2_BookManagement\DAO\bin\Debug\net5.0\DAO.dll
+E:\workplace\prn231\Assignment2_BookManagement\DAO\bin\Debug\net5.0\DAO.pdb
+E:\workplace\prn231\Assignment2_BookManagement\DAO\bin\Debug\net5.0\BusinessObject.dll
+E:\workplace\prn231\Assignment2_BookManagement\DAO\bin\Debug\net5.0\BusinessObject.pdb
+E:\workplace\prn231\Assignment2_BookManagement\DAO\obj\Debug\net5.0\DAO.csproj.AssemblyReference.cache
+E:\workplace\prn231\Assignment2_BookManagement\DAO\obj\Debug\net5.0\DAO.GeneratedMSBuildEditorConfig.editorconfig
+E:\workplace\prn231\Assignment2_BookManagement\DAO\obj\Debug\net5.0\DAO.AssemblyInfoInputs.cache
+E:\workplace\prn231\Assignment2_BookManagement\DAO\obj\Debug\net5.0\DAO.AssemblyInfo.cs
+E:\workplace\prn231\Assignment2_BookManagement\DAO\obj\Debug\net5.0\DAO.csproj.CoreCompileInputs.cache
+E:\workplace\prn231\Assignment2_BookManagement\DAO\obj\Debug\net5.0\DAO.csproj.CopyComplete
+E:\workplace\prn231\Assignment2_BookManagement\DAO\obj\Debug\net5.0\DAO.dll
+E:\workplace\prn231\Assignment2_BookManagement\DAO\obj\Debug\net5.0\refint\DAO.dll
+E:\workplace\prn231\Assignment2_BookManagement\DAO\obj\Debug\net5.0\DAO.pdb
+E:\workplace\prn231\Assignment2_BookManagement\DAO\obj\Debug\net5.0\ref\DAO.dll
